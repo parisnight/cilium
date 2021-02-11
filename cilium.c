@@ -52,7 +52,7 @@ unsigned globframe=0;
 unsigned *p;			/* hack daw voice scheduler pointer */
 unsigned schedule[100]={0xffffffff};
 unsigned mark, loop, converttoframes=48000, npeak=0;
-char sampleactive, playplay, timer;
+char sampleactive, playplay, timer, fileformat=2;
 float peak;
 
 void logit (char *s) {
@@ -92,7 +92,7 @@ void save_sndfile (struct sample *s, char *str) {
   sfinfo.frames=s->nframes; /* required for flac */
   sfinfo.samplerate=s->rate;
   sfinfo.channels=s->nchannels;
-  sfinfo.format=formats[0];
+  sfinfo.format=formats[fileformat];
   if ((infile = sf_open(str, SFM_WRITE, &sfinfo)) != NULL) {
     sf_writef_float(infile, s->wave, s->nframes);
   } else printf("Couldn't save file %s\n",sf_strerror(infile));
@@ -390,7 +390,7 @@ void jack_init () {
 
 #define EXIT 999
 #define nmenu 1
-#define nchoice 22
+#define nchoice 23
 char *menu[nmenu][nchoice] = {
   {
    "?",
@@ -414,7 +414,8 @@ char *menu[nmenu][nchoice] = {
    "sp mc nb nl nh tr a d jo v1 v2",
    "ns         sec, channels",
    "inc",
-   "nframes"
+   "nframes",
+   "fileformat d"
   }
 };
 
@@ -549,6 +550,7 @@ int main (int argc, char **argv) {
       sa=sarray+sampleactive;
       fscanf(cfil,"%f",&f); sa->nframes = f * converttoframes;
       break;
+    case 22: fscanf(cfil, "%d", fileformat); break;
     }
   }
   }
