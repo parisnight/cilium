@@ -87,8 +87,8 @@ void save_sndfile (struct sample *s, char *str) {
   SF_INFO sfinfo;
   static int formats[]={
     SF_FORMAT_WAV  | SF_FORMAT_FLOAT,
-    SF_FORMAT_FLAC | SF_FORMAT_PCM_24,
-    SF_FORMAT_WAV  | SF_FORMAT_PCM_16 };
+    SF_FORMAT_WAV  | SF_FORMAT_PCM_16,
+    SF_FORMAT_FLAC | SF_FORMAT_PCM_24 };
   sfinfo.frames=s->nframes; /* required for flac */
   sfinfo.samplerate=s->rate;
   sfinfo.channels=s->nchannels;
@@ -408,14 +408,14 @@ char *menu[nmenu][nchoice] = {
    "ls",
    "conversion bpmeas bpm",
    "schedule   d d ..",
-   "sf         d file",
+   "sf         file",
    "cd path",
    "get file",
    "sp mc nb nl nh tr a d jo v1 v2",
    "ns         sec, channels",
    "inc",
    "nframes",
-   "fileformat d"
+   "fileformat c"
   }
 };
 
@@ -514,8 +514,8 @@ int main (int argc, char **argv) {
       for (j=0; j<=i; j++) printf("%d ",schedule[j]);
       break;
     case 15:
-      fscanf(cfil, "%d %s", &i, str);
-      save_sndfile(sarray+i,str);
+      fscanf(cfil, "%s", str);
+      save_sndfile(sarray+sampleactive,str);
       break;
     case 16: fscanf(cfil, "%s", &path); break;
     case 17:
@@ -550,7 +550,7 @@ int main (int argc, char **argv) {
       sa=sarray+sampleactive;
       fscanf(cfil,"%f",&f); sa->nframes = f * converttoframes;
       break;
-    case 22: fscanf(cfil, "%d", fileformat); break;
+    case 22: fscanf(cfil, "%d", &fileformat); break;
     }
   }
   }
