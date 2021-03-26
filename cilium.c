@@ -56,9 +56,10 @@ char sampleactive, playplay, timer, fileformat=2;
 float peak;
 
 void logit (char *s) {
-  FILE *outf;
+  /*FILE *outf;
   if ((outf=fopen("cilium.log","a"))!=NULL) fputs(s, outf);
-  fclose(outf);
+  fclose(outf);*/
+  fputs(s,stdout);
 }
 
 void load_sndfile (struct sample *s, int stereoify) {
@@ -260,8 +261,8 @@ int process (jack_nframes_t nframes, void *arg) {
   }
 
   if (!(timer++ %10)) {
-    printf("\033[s \033[0;0H \033[33m  %-8.0f %d %40d %8d %8d\033[u", 20.0f * log10f(peak), npeak,
-	   pos.frame/converttoframes, pos.frame/srate, sampleactive);
+    printf("\033[s \033[0;0H \033[33m  %-8.0f %8d %d %40d %8d\033[u", 20.0f * log10f(peak), npeak,
+ 	   sampleactive, pos.frame/converttoframes, pos.frame/srate);
     peak=0;
   }
   fflush(stdout);
@@ -390,7 +391,7 @@ void jack_init () {
 
 #define EXIT 999
 #define nmenu 1
-#define nchoice 23
+#define nchoice 24
 char *menu[nmenu][nchoice] = {
   {
    "?",
@@ -398,7 +399,7 @@ char *menu[nmenu][nchoice] = {
    "%",
    "!",
    "pipe       s",
-   "rec",
+   "r",
    "ssampleactive     d",
    "p",
    "locate",
@@ -415,7 +416,8 @@ char *menu[nmenu][nchoice] = {
    "ns         sec, channels",
    "inc",
    "nframes",
-   "fileformat c"
+   "fileformat c",
+   "shift"
   }
 };
 
@@ -548,9 +550,16 @@ int main (int argc, char **argv) {
     case 20: sampleactive++; printf("sa %d\n",sampleactive); break;
     case 21:
       sa=sarray+sampleactive;
-      fscanf(cfil,"%f",&f); sa->nframes = f * converttoframes;
+      fscanf(cfil,"%f",&f);
+      sa->nframes = f * converttoframes;
       break;
     case 22: fscanf(cfil, "%d", &fileformat); break;
+    case 23:
+      fscanf(cfil, "%d", &j);
+      sa=sarray+sampleactive;
+      for (i=0; i < (sa->nframes - j) * sa->nchannels; i++)
+	sa->wave[i] = sa->wave[i+j];
+      break;
     }
   }
   }
