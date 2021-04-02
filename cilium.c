@@ -51,7 +51,7 @@ float pitchwheel[16];		/* pitchwheel for each channel */
 unsigned globframe=0;
 unsigned *p;			/* hack daw voice scheduler pointer */
 unsigned schedule[100]={0xffffffff};
-unsigned mark, loop, converttoframes=48000, npeak=0;
+unsigned mark, loop, converttoframes=48000, npeak=0, lag=0;
 char sampleactive, playplay, timer, fileformat=2;
 float peak;
 
@@ -172,7 +172,7 @@ void voicerecord (jack_default_audio_sample_t **port, int frames,
       v->here=0.0;
     }
     for (j=0; j< v->s->nchannels; j++) {
-      v->s->wave[((int) v->here) * v->s->nchannels + j]=port[j][i];
+      v->s->wave[((int) v->here - lag) * v->s->nchannels + j]=port[j][i];
       if (port[j][i] > peak) {       /* could use a fabs() */
 	peak=port[j][i];
 	if (peak > 0.99) npeak++;    /* 0.99 magic fudge */
@@ -391,7 +391,7 @@ void jack_init () {
 
 #define EXIT 999
 #define nmenu 1
-#define nchoice 24
+#define nchoice 25
 char *menu[nmenu][nchoice] = {
   {
    "?",
@@ -415,9 +415,10 @@ char *menu[nmenu][nchoice] = {
    "sp mc nb nl nh tr a d jo v1 v2",
    "ns         sec, channels",
    "inc",
-   "nframes",
+   "nframesi   f",
    "fileformat c",
-   "shift"
+   "shift    d",
+   "lag   d"
   }
 };
 
@@ -560,6 +561,9 @@ int main (int argc, char **argv) {
       for (i=0; i < (sa->nframes - j) * sa->nchannels; i++)
 	sa->wave[i] = sa->wave[i+j];
       break;
+    case 24:
+      fscanf(cfil, "%d", &lag); 
+      break; 
     }
   }
   }
