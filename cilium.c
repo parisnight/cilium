@@ -561,9 +561,7 @@ int main (int argc, char **argv) {
       for (i=0; i < (sa->nframes - j) * sa->nchannels; i++)
 	sa->wave[i] = sa->wave[i+j];
       break;
-    case 24:
-      fscanf(cfil, "%d", &lag); 
-      break; 
+    case 24: fscanf(cfil, "%d", &lag); break; 
     }
   }
   }
