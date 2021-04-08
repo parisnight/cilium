@@ -52,7 +52,7 @@ unsigned globframe=0;
 unsigned *p;			/* hack daw voice scheduler pointer */
 unsigned schedule[100]={0xffffffff};
 unsigned mark, loop, converttoframes=48000, npeak=0, lag=0;
-char sampleactive, playplay, timer, fileformat=2;
+char sampleactive, playplay, timer, fileformat=0;
 float peak;
 
 void logit (char *s) {
