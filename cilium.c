@@ -390,7 +390,7 @@ void jack_init () {
 }
 
 int converttoindex(struct sample *s, int pos) {
-return(converttoframes * s->nchannels);
+return(pos * converttoframes * s->nchannels);
 }
 
 #define EXIT 999
@@ -569,9 +569,9 @@ int main (int argc, char **argv) {
 	sa->wave[i+j] = sa->wave[i];*/
       fscanf(cfil, "%d%d%d", &j,&k,&l);
       sa=sarray+sampleactive;
-      j *= converttoindex(sa, j);
-      k *= converttoindex(sa, k);
-      l *= converttoindex(sa, l);
+      j = converttoindex(sa, j);
+      k = converttoindex(sa, k);
+      l = converttoindex(sa, l);
       if (j>l) {
       for (i=0; i < k; i++)
 	sa->wave[l+i] = sa->wave[j+i];
