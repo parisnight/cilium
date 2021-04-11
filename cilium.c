@@ -389,6 +389,10 @@ void jack_init () {
   jack_activate(client);
 }
 
+int converttoindex(struct sample *s, int pos) {
+return(converttoframes * s->nchannels);
+}
+
 #define EXIT 999
 #define nmenu 1
 #define nchoice 25
@@ -415,7 +419,7 @@ char *menu[nmenu][nchoice] = {
    "sp mc nb nl nh tr a d jo v1 v2",
    "ns         sec, channels",
    "inc",
-   "nframesi   f",
+   "nframes   f",
    "fileformat c",
    "shift    d",
    "lag   d"
@@ -449,7 +453,7 @@ int choice (int m, char *s, FILE *fil) {
 }
 
 int main (int argc, char **argv) {
-  int i, j, mipo, cmd, stakptr=0; /* no static vars need initialization */
+  int i, j, k, l, mipo, cmd, stakptr=0; /* no static vars need initialization */
   char str[80], path[80], fil[80];
   float f;
   char notebase=36;
@@ -556,10 +560,25 @@ int main (int argc, char **argv) {
       break;
     case 22: fscanf(cfil, "%d", &fileformat); break;
     case 23:
-      fscanf(cfil, "%d", &j);
+/*      fscanf(cfil, "%d", &j);
+      j *= converttoframes;
       sa=sarray+sampleactive;
       for (i=0; i < (sa->nframes - j) * sa->nchannels; i++)
 	sa->wave[i] = sa->wave[i+j];
+      for (i= (sa->nframes - j) * sa->nchannels; i >= 0; i--)
+	sa->wave[i+j] = sa->wave[i];*/
+      fscanf(cfil, "%d%d%d", &j,&k,&l);
+      sa=sarray+sampleactive;
+      j *= converttoindex(sa, j);
+      k *= converttoindex(sa, k);
+      l *= converttoindex(sa, l);
+      if (j>l) {
+      for (i=0; i < k; i++)
+	sa->wave[l+i] = sa->wave[j+i];
+      } else {
+      for (i= k; i >= 0; i--)
+	sa->wave[l+i] = sa->wave[j+i];
+      }
       break;
     case 24: fscanf(cfil, "%d", &lag); break; 
     }
