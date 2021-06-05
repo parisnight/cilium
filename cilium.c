@@ -395,7 +395,7 @@ return(pos * converttoframes * s->nchannels);
 
 #define EXIT 999
 #define nmenu 1
-#define nchoice 25
+#define nchoice 26
 char *menu[nmenu][nchoice] = {
   {
    "?",
@@ -422,7 +422,8 @@ char *menu[nmenu][nchoice] = {
    "nframes   f",
    "fileformat c",
    "shift    d",
-   "lag   d"
+   "lag   d",
+   "statistics"
   }
 };
 
@@ -455,7 +456,7 @@ int choice (int m, char *s, FILE *fil) {
 int main (int argc, char **argv) {
   int i, j, k, l, mipo, cmd, stakptr=0; /* no static vars need initialization */
   char str[80], path[80], fil[80];
-  float f;
+  float f,fmin,fmax;
   char notebase=36;
   struct sample *sa;
   FILE *cfil, *stak[10];
@@ -581,6 +582,18 @@ int main (int argc, char **argv) {
       }
       break;
     case 24: fscanf(cfil, "%d", &lag); break; 
+    case 25:
+      sa=sarray+sampleactive;
+      for (j=0; j < sa->nchannels; j++) {
+        for (i=j, fmin=100.0, fmax=k=0; i < sa->nframes * sa->nchannels; i+=sa->nchannels) {
+          f = fabsf(sa->wave[i] - sa->wave[i + sa->nchannels]);
+          if (f > 0 && f < fmin) fmin=f;
+          if (fabsf(sa->wave[i])== fmax) k++;
+          if (fabsf(sa->wave[i]) > fmax) { fmax=fabsf(sa->wave[i]); k=1;}
+        }
+      printf("deltamin %g max %g num %d\n",fmin,fmax,k);
+      }
+      break;
     }
   }
   }
