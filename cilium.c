@@ -591,7 +591,7 @@ int main (int argc, char **argv) {
           if (fabsf(sa->wave[i])== fmax) k++;
           if (fabsf(sa->wave[i]) > fmax) { fmax=fabsf(sa->wave[i]); k=1;}
         }
-      printf("deltamin %g max %g num %d\n",fmin,fmax,k);
+        printf("deltamin %g max %g num %d\n",fmin,fmax,k);
       }
       break;
     }
